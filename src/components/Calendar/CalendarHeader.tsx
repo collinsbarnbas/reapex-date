@@ -1,92 +1,114 @@
-import React, { useCallback } from 'react';
-
-const MONTH_NAMES = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'
-] as const;
+import React, { useCallback, useMemo } from 'react';
+import type { CalendarView } from '../../engine/types';
+import type { ReapexLocale } from '../../engine/locale';
+import { getDecadeLabel } from '../../engine/yearGrid';
 
 export interface CalendarHeaderProps {
   viewDate: Date;
+  activeView: CalendarView;
   navigateNextMonth: () => void;
   navigatePrevMonth: () => void;
   navigateNextYear: () => void;
   navigatePrevYear: () => void;
+  onTitleClick: () => void;
+  /** Locale config for month names and navigation labels */
+  locale?: ReapexLocale;
   /** Optional custom month/year formatter. Receives (month: number, year: number). */
   formatMonthYear?: (month: number, year: number) => string;
   className?: string;
 }
 
+const DEFAULT_MONTH_NAMES = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
+] as const;
+
 /**
- * Presentational shell displaying localized month/year names and navigation controls.
- * Pure markup — no hardcoded styles. Style via data attributes or className.
+ * Presentational header with localized display and navigation controls.
+ * Title is clickable — cycles through day → month → year views.
+ * Navigation arrows change context based on active view.
  */
 export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   viewDate,
+  activeView,
   navigateNextMonth,
   navigatePrevMonth,
   navigateNextYear,
   navigatePrevYear,
+  onTitleClick,
+  locale,
   formatMonthYear,
   className
 }) => {
   const month = viewDate.getMonth();
   const year = viewDate.getFullYear();
+  const monthNames = locale?.monthNames ?? DEFAULT_MONTH_NAMES;
 
-  const displayLabel = useCallback(() => {
+  const displayLabel = useMemo(() => {
+    if (activeView === 'year') {
+      return getDecadeLabel(year);
+    }
+    if (activeView === 'month') {
+      return String(year);
+    }
     if (formatMonthYear) {
       return formatMonthYear(month, year);
     }
-    return `${MONTH_NAMES[month]} ${year}`;
-  }, [month, year, formatMonthYear]);
+    return `${monthNames[month]} ${year}`;
+  }, [month, year, activeView, formatMonthYear, monthNames]);
+
+  const handlePrev = useCallback(() => {
+    if (activeView === 'day') navigatePrevMonth();
+    else navigatePrevYear();
+  }, [activeView, navigatePrevMonth, navigatePrevYear]);
+
+  const handleNext = useCallback(() => {
+    if (activeView === 'day') navigateNextMonth();
+    else navigateNextYear();
+  }, [activeView, navigateNextMonth, navigateNextYear]);
+
+  const navLabels = locale?.navigation;
+  const prevLabel = activeView === 'day'
+    ? (navLabels?.prevMonth ?? `Go to previous month`)
+    : (navLabels?.prevYear ?? `Go to previous year`);
+  const nextLabel = activeView === 'day'
+    ? (navLabels?.nextMonth ?? `Go to next month`)
+    : (navLabels?.nextYear ?? `Go to next year`);
 
   return (
     <div
       className={className}
       data-calendar-header=""
+      data-view={activeView}
       role="presentation"
     >
       <button
         type="button"
-        onClick={navigatePrevYear}
-        aria-label={`Go to previous year, ${year - 1}`}
-        data-nav="prev-year"
-      >
-        {'«'}
-      </button>
-
-      <button
-        type="button"
-        onClick={navigatePrevMonth}
-        aria-label={`Go to previous month, ${MONTH_NAMES[(month - 1 + 12) % 12]}`}
-        data-nav="prev-month"
+        onClick={handlePrev}
+        aria-label={prevLabel}
+        data-nav="prev"
       >
         {'‹'}
       </button>
 
-      <span
+      <button
+        type="button"
+        onClick={onTitleClick}
         data-calendar-title=""
         aria-live="polite"
         aria-atomic="true"
+        aria-label={`Switch view, currently showing ${displayLabel}`}
       >
-        {displayLabel()}
-      </span>
-
-      <button
-        type="button"
-        onClick={navigateNextMonth}
-        aria-label={`Go to next month, ${MONTH_NAMES[(month + 1) % 12]}`}
-        data-nav="next-month"
-      >
-        {'›'}
+        {displayLabel}
       </button>
 
       <button
         type="button"
-        onClick={navigateNextYear}
-        aria-label={`Go to next year, ${year + 1}`}
-        data-nav="next-year"
+        onClick={handleNext}
+        aria-label={nextLabel}
+        data-nav="next"
       >
-        {'»'}
+        {'›'}
       </button>
     </div>
   );

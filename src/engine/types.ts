@@ -1,5 +1,7 @@
 export type PickerMode = 'single' | 'range' | 'multiple';
 
+export type CalendarView = 'day' | 'month' | 'year';
+
 export interface CalendarDay {
   date: Date;
   isCurrentMonth: boolean;
@@ -11,6 +13,21 @@ export interface CalendarDay {
   isRangeEnd: boolean;
   isHovered: boolean;
   isFocused: boolean;
+}
+
+export interface MonthCell {
+  month: number;
+  label: string;
+  isCurrentMonth: boolean;
+  isSelected: boolean;
+  isDisabled: boolean;
+}
+
+export interface YearCell {
+  year: number;
+  isCurrentYear: boolean;
+  isSelected: boolean;
+  isDisabled: boolean;
 }
 
 export interface DatePickerBaseConfig {

@@ -11,10 +11,12 @@
 
 - **Headless-First Architecture** — Pure date-math hooks decoupled from presentation
 - **Zero `any` TypeScript** — Strict, precise typing throughout
-- **WAI-ARIA Native** — Full keyboard navigation (Arrows, Page, Home/End, Enter/Space)
-- **Tree-Shakable** — Named function exports, barrel files, `sideEffects: false`
+- **WAI-ARIA Native** — Full keyboard navigation, Focus Trapping, and screen reader labels
 - **3 Selection Modes** — Single, Range, and Multiple date picking
-- **Framework-Agnostic Engine** — Pure math layer with zero React dependency
+- **Time & DateTime** — Includes `TimePicker` and combined `DateTimePicker`
+- **Internationalization (i18n)** — 8 built-in locales with auto-RTL support
+- **Month & Year Views** — Quick navigation via decade/year grids
+- **Custom Rendering** — `renderDay` and `renderFooter` injection
 - **Data-Attribute Styling** — Style via CSS selectors, Tailwind, or any framework
 
 ---
@@ -31,50 +33,91 @@ npm install reapex-date
 
 ## 🚀 Quick Start
 
-### Single Date Picker
+### 1. DatePicker with Popover (Input Box)
 
 ```tsx
 import { useState } from 'react';
-import { CalendarRoot } from 'reapex-date';
-import type { UseSingleCalendarConfig } from 'reapex-date';
+import { DatePickerInput, en } from 'reapex-date';
 
 function MyDatePicker() {
   const [value, setValue] = useState<Date | null>(null);
 
-  const config: UseSingleCalendarConfig = {
-    mode: 'single',
-    value,
-    onChange: setValue,
-  };
-
-  return <CalendarRoot config={config} />;
+  return (
+    <DatePickerInput 
+      config={{ mode: 'single', value, onChange: setValue }} 
+      locale={en}
+      placeholder="Select date..." 
+    />
+  );
 }
 ```
 
-### Range Picker
+### 2. DateTime Picker
 
 ```tsx
-import { CalendarRoot } from 'reapex-date';
-import type { UseRangeCalendarConfig } from 'reapex-date';
+import { useState } from 'react';
+import { DateTimePicker } from 'reapex-date';
 
-const config: UseRangeCalendarConfig = {
-  mode: 'range',
-  value: [startDate, endDate],
-  onChange: setRange,
-};
+function MyDateTimePicker() {
+  const [value, setValue] = useState<Date | null>(null);
+
+  return (
+    <DateTimePicker 
+      value={value} 
+      onChange={setValue} 
+      use12Hour={true} 
+      minuteStep={5} 
+    />
+  );
+}
 ```
 
-### Multiple Picker
+### 3. Range Picker
 
 ```tsx
-import { CalendarRoot } from 'reapex-date';
-import type { UseMultipleCalendarConfig } from 'reapex-date';
+import { useState } from 'react';
+import { DatePickerInput } from 'reapex-date';
 
-const config: UseMultipleCalendarConfig = {
-  mode: 'multiple',
-  value: selectedDates,
-  onChange: setDates,
-};
+function MyRangePicker() {
+  const [value, setValue] = useState<[Date | null, Date | null]>([null, null]);
+
+  return (
+    <DatePickerInput 
+      config={{ mode: 'range', value, onChange: setValue }} 
+      format="DD/MM/YYYY"
+    />
+  );
+}
+```
+
+### 4. Inline Calendar with Multi-Select
+
+```tsx
+import { useState } from 'react';
+import { CalendarRoot } from 'reapex-date';
+
+function MyCalendar() {
+  const [value, setValue] = useState<Date[]>([]);
+
+  return (
+    <CalendarRoot 
+      config={{ mode: 'multiple', value, onChange: setValue }} 
+    />
+  );
+}
+```
+
+---
+
+## 🌍 Locales & i18n
+
+ReApexDate comes with 8 built-in locales: `en`, `es`, `fr`, `de`, `ja`, `zh`, `ar` (RTL), `hi`.
+
+```tsx
+import { DatePickerInput, ar } from 'reapex-date';
+
+// The arabic locale automatically sets `dir="rtl"` and weekStartsOn=6 (Saturday)
+<DatePickerInput config={config} locale={ar} />
 ```
 
 ---
@@ -98,7 +141,7 @@ ReApexDate renders **unstyled semantic HTML** with rich `data-*` attributes. Sty
 }
 ```
 
-### Available Data Attributes
+### Core Data Attributes
 
 | Attribute | Description |
 |-----------|-------------|
@@ -107,11 +150,8 @@ ReApexDate renders **unstyled semantic HTML** with rich `data-*` attributes. Sty
 | `data-in-range` | Dates between range start/end |
 | `data-range-start` | First date in range |
 | `data-range-end` | Last date in range |
-| `data-hover-range` | Hover preview in range mode |
-| `data-focused` | Keyboard-focused date |
-| `data-disabled` | Disabled date |
-| `data-outside-month` | Trailing/leading month days |
-| `data-date` | ISO date string (YYYY-MM-DD) |
+| `data-view="day\|month\|year"` | Current calendar view |
+| `data-time-cell` | Target time picker cells |
 
 ---
 
@@ -120,21 +160,15 @@ ReApexDate renders **unstyled semantic HTML** with rich `data-*` attributes. Sty
 ```
 src/
 ├── engine/          # Pure math (zero React imports)
-│   ├── types.ts     # Canonical type definitions
-│   └── calendar.ts  # 42-day matrix generation
 ├── hooks/           # Stateful React layer
-│   ├── useCalendar.ts
-│   └── useDatePickerKeyboard.ts
 ├── a11y/            # Accessibility utilities
-│   ├── keyboard.ts  # WAI-ARIA key event router
-│   └── focus-trap.ts
+├── locales/         # i18n configurations
 ├── components/      # Presentational components
-│   └── Calendar/
-│       ├── CalendarRoot.tsx
-│       ├── CalendarHeader.tsx
-│       └── CalendarGrid.tsx
+│   ├── Calendar/
+│   ├── DatePickerInput/
+│   ├── TimePicker/
+│   └── DateTimePicker/
 └── utils/
-    └── dateAdapter.ts  # dayjs wrapper (named exports)
 ```
 
 ---

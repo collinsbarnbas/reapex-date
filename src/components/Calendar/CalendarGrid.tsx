@@ -14,6 +14,8 @@ export interface CalendarGridProps {
   dayNames?: readonly string[];
   /** Optional custom day cell formatter. */
   formatDay?: (date: Date) => string;
+  /** Custom day cell renderer. Receives the CalendarDay data and default label. */
+  renderDay?: (day: CalendarDay, defaultLabel: string) => React.ReactNode;
   className?: string;
 }
 
@@ -30,6 +32,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
   onKeyDown,
   dayNames,
   formatDay,
+  renderDay,
   className
 }) => {
   const gridRef = useRef<HTMLTableElement>(null);
@@ -139,7 +142,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
                     day: 'numeric'
                   })}
                 >
-                  {getDayLabel(day.date)}
+                  {renderDay ? renderDay(day, getDayLabel(day.date)) : getDayLabel(day.date)}
                 </button>
               </td>
             ))}

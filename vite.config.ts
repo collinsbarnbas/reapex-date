@@ -19,6 +19,7 @@ export default defineConfig({
         'engine/index': resolve(__dirname, 'src/engine/index.ts'),
         'hooks/index': resolve(__dirname, 'src/hooks/index.ts'),
         'components/index': resolve(__dirname, 'src/components/index.ts'),
+        'locales/index': resolve(__dirname, 'src/locales/index.ts'),
       },
       formats: ['es', 'cjs'],
     },
