@@ -185,6 +185,7 @@ export function CalendarRoot<T extends UseCalendarConfig>({
           minDate={config.minDate}
           maxDate={config.maxDate}
           onMonthSelect={handleMonthSelect}
+          locale={locale}
           className={classNames?.monthGrid}
         />
       )}

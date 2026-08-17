@@ -20,12 +20,18 @@ export interface DateTimePickerProps {
   shouldDisableDate?: (date: Date) => boolean;
   /** Use 12-hour format for time */
   use12Hour?: boolean;
+  /** Show seconds column (default: false) */
+  showSeconds?: boolean;
   /** Minute step interval (default: 1) */
   minuteStep?: number;
+  /** Second step interval (default: 1) */
+  secondStep?: number;
   /** Disabled hours (0-23) */
   disabledHours?: number[];
   /** Disabled minutes (0-59) */
   disabledMinutes?: number[];
+  /** Disabled seconds (0-59) */
+  disabledSeconds?: number[];
   /** Locale configuration */
   locale?: ReapexLocale;
   /** Class names for styling */
@@ -56,9 +62,12 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
   disabledDates,
   shouldDisableDate,
   use12Hour = false,
+  showSeconds = false,
   minuteStep = 1,
+  secondStep = 1,
   disabledHours = [],
   disabledMinutes = [],
+  disabledSeconds = [],
   locale,
   classNames
 }) => {
@@ -111,7 +120,9 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
     });
     const h = String(value.getHours()).padStart(2, '0');
     const m = String(value.getMinutes()).padStart(2, '0');
-    return `${dateStr} ${h}:${m}`;
+    const s = String(value.getSeconds()).padStart(2, '0');
+    const timePart = showSeconds ? `${h}:${m}:${s}` : `${h}:${m}`;
+    return `${dateStr} ${timePart}`;
   }, [value]);
 
   return (
@@ -142,9 +153,12 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
           value={currentTime}
           onChange={handleTimeChange}
           use12Hour={use12Hour}
+          showSeconds={showSeconds}
           minuteStep={minuteStep}
+          secondStep={secondStep}
           disabledHours={disabledHours}
           disabledMinutes={disabledMinutes}
+          disabledSeconds={disabledSeconds}
           classNames={{
             root: classNames?.timePicker,
             column: classNames?.timeColumn,

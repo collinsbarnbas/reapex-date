@@ -23,8 +23,8 @@ export function useDatePickerPopover(): UseDatePickerPopoverReturn {
     onOpenChange: setIsOpen,
     placement: 'bottom-start',
     middleware: [
-      offset(4),
-      flip({ fallbackPlacements: ['top-start', 'bottom-end', 'top-end'] }),
+      offset(8),
+      flip({ fallbackPlacements: ['bottom-end'] }),
       shift({ padding: 8 })
     ],
     whileElementsMounted: autoUpdate

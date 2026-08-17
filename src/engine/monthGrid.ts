@@ -11,6 +11,8 @@ export interface GenerateMonthGridOptions {
   maxDate?: Date;
   /** The currently selected/viewing month (0-11). Used to highlight the active month. */
   selectedMonth?: number;
+  /** Custom month labels (short names). Overrides the default English labels. */
+  monthLabels?: readonly string[];
 }
 
 /**
@@ -21,7 +23,8 @@ export function generateMonthGrid({
   year,
   minDate,
   maxDate,
-  selectedMonth
+  selectedMonth,
+  monthLabels
 }: GenerateMonthGridOptions): MonthCell[] {
   const today = new Date();
   const currentMonth = today.getMonth();
@@ -50,9 +53,10 @@ export function generateMonthGrid({
       }
     }
 
+    const labels = monthLabels ?? MONTH_LABELS;
     cells.push({
       month,
-      label: MONTH_LABELS[month] ?? '',
+      label: labels[month] ?? '',
       isCurrentMonth: year === currentYear && month === currentMonth,
       isSelected: selectedMonth !== undefined && month === selectedMonth,
       isDisabled

@@ -34,7 +34,7 @@
   ],
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "vite build && tsc",
     "preview": "vite preview",
     "lint": "tsc --noEmit",
     "test": "vitest"

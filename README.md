@@ -52,21 +52,24 @@ function MyDatePicker() {
 }
 ```
 
-### 2. DateTime Picker
+### 2. DateTime Picker with Input
 
 ```tsx
 import { useState } from 'react';
-import { DateTimePicker } from 'reapex-date';
+import { DateTimePickerInput } from 'reapex-date';
 
 function MyDateTimePicker() {
   const [value, setValue] = useState<Date | null>(null);
 
   return (
-    <DateTimePicker 
+    <DateTimePickerInput 
       value={value} 
       onChange={setValue} 
-      use12Hour={true} 
-      minuteStep={5} 
+      use12Hour={true}      // 12h with AM/PM
+      showSeconds={true}    // Include seconds column
+      minuteStep={5}        // 5-minute intervals
+      okText="Confirm"      // Custom OK button text
+      placeholder="Pick date & time..."
     />
   );
 }
@@ -159,15 +162,16 @@ ReApexDate renders **unstyled semantic HTML** with rich `data-*` attributes. Sty
 
 ```
 src/
-├── engine/          # Pure math (zero React imports)
-├── hooks/           # Stateful React layer
-├── a11y/            # Accessibility utilities
-├── locales/         # i18n configurations
-├── components/      # Presentational components
-│   ├── Calendar/
-│   ├── DatePickerInput/
-│   ├── TimePicker/
-│   └── DateTimePicker/
+├── engine/              # Pure math (zero React imports)
+├── hooks/               # Stateful React layer
+├── a11y/                # Accessibility utilities
+├── locales/             # i18n configurations
+├── components/          # Presentational components
+│   ├── Calendar/        # CalendarRoot, Header, Grid, MonthView, YearView
+│   ├── DatePickerInput/ # Input + popover for date selection
+│   ├── TimePicker/      # Scrollable hour/min/sec columns
+│   ├── DateTimePicker/  # Inline calendar + time picker
+│   └── DateTimePickerInput/ # Input + popover for date+time
 └── utils/
 ```
 

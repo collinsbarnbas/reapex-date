@@ -1,7 +1,7 @@
 import React, { useMemo, useCallback, useRef, useEffect } from 'react';
 import { useTimePicker } from '../../hooks/useTimePicker';
-import { generateHourGrid, generateMinuteGrid, to24Hour } from '../../engine/timeGrid';
-import type { TimeValue, HourCell, MinuteCell } from '../../engine/timeGrid';
+import { generateHourGrid, generateMinuteGrid, generateSecondGrid, to24Hour } from '../../engine/timeGrid';
+import type { TimeValue, HourCell, MinuteCell, SecondCell } from '../../engine/timeGrid';
 
 export interface TimePickerProps {
   /** Current time value (controlled) */
@@ -10,12 +10,18 @@ export interface TimePickerProps {
   onChange?: (time: TimeValue) => void;
   /** Use 12-hour format with AM/PM toggle */
   use12Hour?: boolean;
+  /** Show seconds column (default: false) */
+  showSeconds?: boolean;
   /** Minute step interval (default: 1) */
   minuteStep?: number;
+  /** Second step interval (default: 1) */
+  secondStep?: number;
   /** Hours that cannot be selected (0-23) */
   disabledHours?: number[];
   /** Minutes that cannot be selected (0-59) */
   disabledMinutes?: number[];
+  /** Seconds that cannot be selected (0-59) */
+  disabledSeconds?: number[];
   /** Optional class names */
   classNames?: {
     root?: string;
@@ -33,9 +39,12 @@ export const TimePicker: React.FC<TimePickerProps> = ({
   value,
   onChange,
   use12Hour = false,
+  showSeconds = false,
   minuteStep = 1,
+  secondStep = 1,
   disabledHours = [],
   disabledMinutes = [],
+  disabledSeconds = [],
   classNames
 }) => {
   const timer = useTimePicker({ value, onChange, use12Hour, minuteStep, disabledHours, disabledMinutes });
@@ -50,8 +59,16 @@ export const TimePicker: React.FC<TimePickerProps> = ({
     [timer.minute, minuteStep, disabledMinutes]
   );
 
+  const seconds = useMemo(() =>
+    showSeconds
+      ? generateSecondGrid({ selectedSecond: timer.second, secondStep, disabledSeconds })
+      : [],
+    [timer.second, secondStep, disabledSeconds, showSeconds]
+  );
+
   const hourRef = useRef<HTMLDivElement>(null);
   const minuteRef = useRef<HTMLDivElement>(null);
+  const secondRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll selected into view
   useEffect(() => {
@@ -64,7 +81,8 @@ export const TimePicker: React.FC<TimePickerProps> = ({
     };
     scrollToSelected(hourRef.current);
     scrollToSelected(minuteRef.current);
-  }, []);
+    if (showSeconds) scrollToSelected(secondRef.current);
+  }, [showSeconds]);
 
   const handleHourClick = useCallback((cell: HourCell) => {
     if (cell.isDisabled) return;
@@ -81,11 +99,17 @@ export const TimePicker: React.FC<TimePickerProps> = ({
     timer.setMinute(cell.value);
   }, [timer.setMinute]);
 
+  const handleSecondClick = useCallback((cell: SecondCell) => {
+    if (cell.isDisabled) return;
+    timer.setSecond(cell.value);
+  }, [timer.setSecond]);
+
   return (
     <div
       className={classNames?.root}
       data-time-picker=""
       data-format={use12Hour ? '12h' : '24h'}
+      data-show-seconds={showSeconds || undefined}
       role="group"
       aria-label="Time picker"
     >
@@ -147,6 +171,39 @@ export const TimePicker: React.FC<TimePickerProps> = ({
           </button>
         ))}
       </div>
+
+      {/* Seconds Column (optional) */}
+      {showSeconds && (
+        <>
+          <div data-time-separator="" aria-hidden="true">:</div>
+          <div
+            ref={secondRef}
+            className={classNames?.column}
+            data-time-column="second"
+            role="listbox"
+            aria-label="Seconds"
+          >
+            {seconds.map((cell) => (
+              <button
+                key={cell.value}
+                type="button"
+                role="option"
+                className={classNames?.cell}
+                onClick={() => handleSecondClick(cell)}
+                disabled={cell.isDisabled}
+                data-time-cell="second"
+                data-value={cell.value}
+                data-selected={cell.isSelected || undefined}
+                data-disabled={cell.isDisabled || undefined}
+                aria-selected={cell.isSelected}
+                aria-disabled={cell.isDisabled}
+              >
+                {cell.label}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
 
       {/* AM/PM Toggle (12h mode only) */}
       {use12Hour && (

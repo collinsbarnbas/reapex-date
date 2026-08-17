@@ -7,8 +7,8 @@ export type { GenerateMonthGridOptions } from './monthGrid';
 export { generateYearGrid, getDecadeLabel } from './yearGrid';
 export type { GenerateYearGridOptions } from './yearGrid';
 
-export { generateHourGrid, generateMinuteGrid, to24Hour, to12Hour, formatTime } from './timeGrid';
-export type { TimeValue, HourCell, MinuteCell, GenerateHourGridOptions, GenerateMinuteGridOptions } from './timeGrid';
+export { generateHourGrid, generateMinuteGrid, generateSecondGrid, to24Hour, to12Hour, formatTime } from './timeGrid';
+export type { TimeValue, HourCell, MinuteCell, SecondCell, GenerateHourGridOptions, GenerateMinuteGridOptions, GenerateSecondGridOptions } from './timeGrid';
 
 export type {
   PickerMode,

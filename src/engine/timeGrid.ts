@@ -18,6 +18,13 @@ export interface MinuteCell {
   isDisabled: boolean;
 }
 
+export interface SecondCell {
+  value: number;
+  label: string;
+  isSelected: boolean;
+  isDisabled: boolean;
+}
+
 export interface GenerateHourGridOptions {
   selectedHour?: number;
   use12Hour?: boolean;
@@ -28,6 +35,12 @@ export interface GenerateMinuteGridOptions {
   selectedMinute?: number;
   minuteStep?: number;
   disabledMinutes?: number[];
+}
+
+export interface GenerateSecondGridOptions {
+  selectedSecond?: number;
+  secondStep?: number;
+  disabledSeconds?: number[];
 }
 
 /**
@@ -104,12 +117,37 @@ export function to12Hour(hour24: number): { hour: number; meridiem: 'AM' | 'PM' 
 }
 
 /**
+ * Generate a list of second cells for the time picker.
+ * Supports configurable step intervals (default: 1 second).
+ */
+export function generateSecondGrid({
+  selectedSecond,
+  secondStep = 1,
+  disabledSeconds = []
+}: GenerateSecondGridOptions): SecondCell[] {
+  const cells: SecondCell[] = [];
+  const step = Math.max(1, Math.min(60, secondStep));
+
+  for (let i = 0; i < 60; i += step) {
+    cells.push({
+      value: i,
+      label: String(i).padStart(2, '0'),
+      isSelected: selectedSecond !== undefined && i === selectedSecond,
+      isDisabled: disabledSeconds.includes(i)
+    });
+  }
+
+  return cells;
+}
+
+/**
  * Format a TimeValue into a display string.
  */
-export function formatTime(time: TimeValue, use12Hour: boolean = false): string {
+export function formatTime(time: TimeValue, use12Hour: boolean = false, showSeconds: boolean = false): string {
+  const sec = showSeconds ? `:${String(time.second).padStart(2, '0')}` : '';
   if (use12Hour) {
     const { hour, meridiem } = to12Hour(time.hour);
-    return `${String(hour).padStart(2, '0')}:${String(time.minute).padStart(2, '0')} ${meridiem}`;
+    return `${String(hour).padStart(2, '0')}:${String(time.minute).padStart(2, '0')}${sec} ${meridiem}`;
   }
-  return `${String(time.hour).padStart(2, '0')}:${String(time.minute).padStart(2, '0')}`;
+  return `${String(time.hour).padStart(2, '0')}:${String(time.minute).padStart(2, '0')}${sec}`;
 }

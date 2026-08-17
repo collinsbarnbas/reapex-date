@@ -1,5 +1,6 @@
 import React, { useMemo, useCallback } from 'react';
 import type { MonthCell } from '../../engine/types';
+import type { ReapexLocale } from '../../engine/locale';
 import { generateMonthGrid } from '../../engine/monthGrid';
 
 export interface MonthViewProps {
@@ -8,6 +9,8 @@ export interface MonthViewProps {
   minDate?: Date;
   maxDate?: Date;
   onMonthSelect: (month: number) => void;
+  /** Locale for localized month names */
+  locale?: ReapexLocale;
   className?: string;
 }
 
@@ -21,6 +24,7 @@ export const MonthView: React.FC<MonthViewProps> = ({
   minDate,
   maxDate,
   onMonthSelect,
+  locale,
   className
 }) => {
   const months = useMemo(() =>
@@ -28,9 +32,10 @@ export const MonthView: React.FC<MonthViewProps> = ({
       year: viewYear,
       minDate,
       maxDate,
-      selectedMonth: viewMonth
+      selectedMonth: viewMonth,
+      monthLabels: locale?.monthNamesShort
     }),
-    [viewYear, viewMonth, minDate, maxDate]
+    [viewYear, viewMonth, minDate, maxDate, locale]
   );
 
   const handleClick = useCallback((cell: MonthCell) => {
