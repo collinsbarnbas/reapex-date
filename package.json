@@ -1,7 +1,7 @@
 {
   "name": "reapex-date",
   "version": "0.1.0",
-  "description": "High-performance, headless-first, WAI-ARIA compliant React Date Picker",
+  "description": "Headless, accessible, fully customizable React Date & Time Picker with i18n, range selection, and data-attribute styling",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -60,11 +60,21 @@
   "keywords": [
     "react",
     "datepicker",
+    "date-picker",
     "calendar",
     "headless",
     "accessible",
     "aria",
-    "typescript"
+    "typescript",
+    "date-range",
+    "range-picker",
+    "timepicker",
+    "datetime",
+    "i18n",
+    "rtl",
+    "locale",
+    "customizable",
+    "unstyled"
   ],
   "license": "MIT",
   "repository": {
