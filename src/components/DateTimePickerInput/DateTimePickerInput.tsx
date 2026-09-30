@@ -48,8 +48,16 @@ export interface DateTimePickerInputProps {
   locale?: ReapexLocale;
   /** Callback when popover opens/closes */
   onOpenChange?: (isOpen: boolean) => void;
-  /** Text for the confirm button (default: 'OK') */
-  okText?: string;
+  /** Text for "Select Time" toggle (default: 'Select Time') */
+  selectTimeText?: string;
+  /** Text for "Select Date" toggle (default: 'Select Date') */
+  selectDateText?: string;
+  /** Text for "Clear" button (default: 'Clear') */
+  clearText?: string;
+  /** Text for "Now" button (default: 'Now') */
+  nowText?: string;
+  /** Text for "Confirm" button (default: 'Confirm') */
+  confirmText?: string;
   /** Optional class names for styling */
   classNames?: {
     wrapper?: string;
@@ -66,13 +74,13 @@ export interface DateTimePickerInputProps {
     timeColumn?: string;
     timeCell?: string;
     footer?: string;
-    okButton?: string;
   };
 }
 
 /**
  * Complete DateTime picker with text input + floating popover.
  * Shows date and time in the input field, opens a combined calendar + time picker on click.
+ * Popover contains the DateTimePicker with built-in Clear/Now/Confirm buttons.
  */
 export const DateTimePickerInput: React.FC<DateTimePickerInputProps> = ({
   value,
@@ -95,7 +103,11 @@ export const DateTimePickerInput: React.FC<DateTimePickerInputProps> = ({
   weekStartsOn,
   locale,
   onOpenChange,
-  okText = 'OK',
+  selectTimeText,
+  selectDateText,
+  clearText,
+  nowText,
+  confirmText,
   classNames
 }) => {
   const dateFormat = dateFormatProp ?? locale?.formats.date ?? 'MM/DD/YYYY';
@@ -219,6 +231,12 @@ export const DateTimePickerInput: React.FC<DateTimePickerInputProps> = ({
             disabledMinutes={disabledMinutes}
             disabledSeconds={disabledSeconds}
             locale={locale}
+            selectTimeText={selectTimeText}
+            selectDateText={selectDateText}
+            clearText={clearText}
+            nowText={nowText}
+            confirmText={confirmText}
+            onConfirm={handleClose}
             classNames={{
               root: classNames?.root,
               calendar: classNames?.calendar,
@@ -232,18 +250,6 @@ export const DateTimePickerInput: React.FC<DateTimePickerInputProps> = ({
               footer: classNames?.footer
             }}
           />
-
-          {/* OK button to confirm and close */}
-          <div data-datetimepicker-footer="">
-            <button
-              type="button"
-              onClick={handleClose}
-              className={classNames?.okButton}
-              data-datetimepicker-ok=""
-            >
-              {okText}
-            </button>
-          </div>
         </div>
       )}
     </div>
@@ -251,3 +257,4 @@ export const DateTimePickerInput: React.FC<DateTimePickerInputProps> = ({
 };
 
 DateTimePickerInput.displayName = 'DateTimePickerInput';
+

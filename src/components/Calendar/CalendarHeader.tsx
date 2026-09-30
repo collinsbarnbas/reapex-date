@@ -25,8 +25,9 @@ const DEFAULT_MONTH_NAMES = [
 
 /**
  * Presentational header with localized display and navigation controls.
+ * Day view shows 4 buttons: « (prev year) ‹ (prev month) Title › (next month) » (next year).
+ * Month/Year views show 2 buttons: ‹ (prev year/decade) Title › (next year/decade).
  * Title is clickable — cycles through day → month → year views.
- * Navigation arrows change context based on active view.
  */
 export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   viewDate,
@@ -57,6 +58,7 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
     return `${monthNames[month]} ${year}`;
   }, [month, year, activeView, formatMonthYear, monthNames]);
 
+  // In month/year views, ‹/› jump years (or decades). In day view, ‹/› jump months.
   const handlePrev = useCallback(() => {
     if (activeView === 'day') navigatePrevMonth();
     else navigatePrevYear();
@@ -68,12 +70,10 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   }, [activeView, navigateNextMonth, navigateNextYear]);
 
   const navLabels = locale?.navigation;
-  const prevLabel = activeView === 'day'
-    ? (navLabels?.prevMonth ?? `Go to previous month`)
-    : (navLabels?.prevYear ?? `Go to previous year`);
-  const nextLabel = activeView === 'day'
-    ? (navLabels?.nextMonth ?? `Go to next month`)
-    : (navLabels?.nextYear ?? `Go to next year`);
+  const prevMonthLabel = navLabels?.prevMonth ?? 'Go to previous month';
+  const nextMonthLabel = navLabels?.nextMonth ?? 'Go to next month';
+  const prevYearLabel = navLabels?.prevYear ?? 'Go to previous year';
+  const nextYearLabel = navLabels?.nextYear ?? 'Go to next year';
 
   return (
     <div
@@ -82,15 +82,29 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
       data-view={activeView}
       role="presentation"
     >
+      {/* « prev year — visible in day view only */}
+      {activeView === 'day' && (
+        <button
+          type="button"
+          onClick={navigatePrevYear}
+          aria-label={prevYearLabel}
+          data-nav="prev-year"
+        >
+          {'«'}
+        </button>
+      )}
+
+      {/* ‹ prev month (day view) or prev year/decade (month/year view) */}
       <button
         type="button"
         onClick={handlePrev}
-        aria-label={prevLabel}
+        aria-label={activeView === 'day' ? prevMonthLabel : prevYearLabel}
         data-nav="prev"
       >
         {'‹'}
       </button>
 
+      {/* Clickable title */}
       <button
         type="button"
         onClick={onTitleClick}
@@ -102,14 +116,27 @@ export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
         {displayLabel}
       </button>
 
+      {/* › next month (day view) or next year/decade (month/year view) */}
       <button
         type="button"
         onClick={handleNext}
-        aria-label={nextLabel}
+        aria-label={activeView === 'day' ? nextMonthLabel : nextYearLabel}
         data-nav="next"
       >
         {'›'}
       </button>
+
+      {/* » next year — visible in day view only */}
+      {activeView === 'day' && (
+        <button
+          type="button"
+          onClick={navigateNextYear}
+          aria-label={nextYearLabel}
+          data-nav="next-year"
+        >
+          {'»'}
+        </button>
+      )}
     </div>
   );
 };

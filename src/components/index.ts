@@ -23,7 +23,7 @@ export { TimePicker } from './TimePicker';
 export type { TimePickerProps } from './TimePicker';
 
 export { DateTimePicker } from './DateTimePicker';
-export type { DateTimePickerProps } from './DateTimePicker';
+export type { DateTimePickerProps, DateTimeView } from './DateTimePicker';
 
 export { DateTimePickerInput } from './DateTimePickerInput';
 export type { DateTimePickerInputProps } from './DateTimePickerInput';
